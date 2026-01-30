@@ -15,8 +15,11 @@ quality_gate:
     blur_min: 80
     overexpose_ratio_max: 0.25
     underexpose_ratio_max: 0.25
-    color_cast_max: 0.18
+    color_cast_max: 0.23
     tongue_area_ratio_min: 0.15
+    tongue_area_ratio_min: 0.15
+    tongue_area_ratio_suspect: 0.06
+
 
 decision:
   topk: 2
