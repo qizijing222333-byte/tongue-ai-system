@@ -44,7 +44,8 @@ class TonguePredictor:
 
         self._model = None
         self._ready = False
-
+        self.weights_path = ""
+        self.model_version = "FAKE-0.0"
         # 目前先只搭 torch 壳
         if self.backend == "torch" and torch is not None and self.weights_path and os.path.exists(self.weights_path):
             self._load_torch()

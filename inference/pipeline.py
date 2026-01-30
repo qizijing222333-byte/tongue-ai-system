@@ -8,6 +8,31 @@ import cv2
 from inference.quality_gate import load_config, quality_gate
 from rule_engine.rule_engine import RuleEngine
 
+import os
+
+def _get_model_version(predictor) -> str:
+    """
+    FAKE/REAL version switch:
+    - predictor is None or predictor.ready is False -> FAKE-0.0
+    - predictor.ready is True -> REAL-<weights filename or custom tag>
+    """
+    if predictor is None:
+        return "FAKE-0.0"
+
+    # 如果 predictor 提供 ready 字段，优先用它
+    if hasattr(predictor, "ready") and (not predictor.ready):
+        return "FAKE-0.0"
+
+    # 版本号优先用 predictor.model_version（你之后可在 predictor 里写死 REAL-v1.0）
+    mv = getattr(predictor, "model_version", "") or ""
+    if mv:
+        return mv
+
+    # 否则用权重文件名
+    wp = getattr(predictor, "weights_path", "") or ""
+    name = os.path.basename(wp) if wp else "unknown"
+    return f"REAL-{name}"
+
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -47,7 +72,7 @@ def run_pipeline(image_bgr, cfg: Dict[str, Any], predictor=None, return_debug: b
     out: Dict[str, Any] = {
         "request_id": str(uuid.uuid4()),
         "timestamp": _now_iso(),
-        "model_version": "FAKE-0.0",
+        "model_version": _get_model_version(predictor),
         "rule_version": "v2.0",
     }
 
@@ -82,11 +107,12 @@ def run_pipeline(image_bgr, cfg: Dict[str, Any], predictor=None, return_debug: b
     out["detect"] = _format_detect(found=True, conf=1.0, bbox=None)
     out["segment"] = _format_segment(conf=1.0, tongue_area_ratio=q.debug.get("rough_tongue_area_ratio"))
 
-    # ---- Model prediction (fake now) ----
+     # ---- Model prediction ----
     if predictor is None:
-    pred = _fake_predictor()
-else:
-    pred = predictor.predict(image_bgr)
+        pred = _fake_predictor()
+    else:
+        pred = predictor.predict(image_bgr)
+
     out["tongue"] = pred
 
     # ---- Rule engine ----
