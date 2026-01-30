@@ -1,0 +1,151 @@
+{
+  "rule_version": "v2.0",
+  "constitutions": [
+    {
+      "name": "phlegm_damp",
+      "display_name": "痰湿",
+      "rules": [
+        {
+          "id": "P1",
+          "priority": 1,
+          "weight": 1.0,
+          "condition": {
+            "all_of": [
+              {"type": "eq", "field": "body_color", "value": "pale"},
+              {"type": "eq", "field": "coat_color", "value": "white"},
+              {"type": "any_of", "items": [
+                {"type": "eq", "field": "thickness", "value": "thick"},
+                {"type": "eq", "field": "greasy", "value": "greasy"}
+              ]},
+              {"type": "ge", "field": "features.tooth_mark", "value": 0.5}
+            ]
+          },
+          "evidence_text": "淡色舌体多提示偏虚偏湿；白苔且厚/腻提示湿浊偏盛；合并齿痕更支持痰湿倾向。",
+          "advice": {
+            "diet": "少甜少油少生冷，清淡易消化为主。",
+            "lifestyle": "避免久坐熬夜，三餐规律，注意保暖与湿度管理。",
+            "exercise": "快走/骑行等中等强度，每周≥3次，微汗为度。",
+            "medical": "若长期困重痰多、胸闷纳差、便溏明显，建议中医面诊辨证。"
+          },
+          "score": {
+            "type": "gm",
+            "terms": [
+              {"field_prob": "body_color.pale"},
+              {"field_prob": "coat_color.white"},
+              {"field_prob_max": ["thickness.thick", "greasy.greasy"]},
+              {"field_prob": "features.tooth_mark"}
+            ],
+            "multiplier": 1.0
+          }
+        },
+        {
+          "id": "P2",
+          "priority": 2,
+          "weight": 0.8,
+          "condition": {
+            "all_of": [
+              {"type": "eq", "field": "body_color", "value": "pale"},
+              {"type": "eq", "field": "coat_color", "value": "white"},
+              {"type": "any_of", "items": [
+                {"type": "eq", "field": "thickness", "value": "thick"},
+                {"type": "eq", "field": "greasy", "value": "greasy"}
+              ]}
+            ]
+          },
+          "evidence_text": "淡色舌与白厚/腻苔提示湿浊偏盛，符合痰湿倾向（缺少齿痕证据）。",
+          "advice": {
+            "diet": "少甜少油少生冷，清淡易消化为主。",
+            "lifestyle": "避免久坐熬夜，三餐规律。",
+            "exercise": "中等强度有氧为主，每周≥3次。",
+            "medical": "症状持续或加重建议就医辨证。"
+          },
+          "score": {
+            "type": "gm",
+            "terms": [
+              {"field_prob": "body_color.pale"},
+              {"field_prob": "coat_color.white"},
+              {"field_prob_max": ["thickness.thick", "greasy.greasy"]}
+            ],
+            "multiplier": 0.8
+          }
+        }
+      ]
+    },
+    {
+      "name": "damp_heat",
+      "display_name": "湿热",
+      "rules": [
+        {
+          "id": "H1",
+          "priority": 1,
+          "weight": 1.0,
+          "condition": {
+            "all_of": [
+              {"type": "any_label", "field": "body_color", "values": ["red", "dark"]},
+              {"type": "eq", "field": "coat_color", "value": "yellow"},
+              {"type": "any_of", "items": [
+                {"type": "eq", "field": "greasy", "value": "greasy"},
+                {"type": "eq", "field": "thickness", "value": "thick"}
+              ]}
+            ]
+          },
+          "evidence_text": "黄苔常见于热象；舌质偏红/深提示热象更明显；厚/腻提示湿热夹杂。",
+          "advice": {
+            "diet": "少辛辣烧烤油炸与酒，清淡多蔬菜、足量饮水。",
+            "lifestyle": "避免熬夜与情绪波动，减少高糖饮品。",
+            "exercise": "适度出汗为主，避免过度暴汗。",
+            "medical": "若口苦口臭、尿黄便黏、痘多或腹泻发热持续，建议就医。"
+          },
+          "score": {
+            "type": "gm",
+            "terms": [
+              {"field_prob_max": ["body_color.red", "body_color.dark"]},
+              {"field_prob": "coat_color.yellow"},
+              {"field_prob_max": ["greasy.greasy", "thickness.thick"]}
+            ],
+            "multiplier": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "name": "yin_def",
+      "display_name": "阴虚",
+      "rules": [
+        {
+          "id": "Y1",
+          "priority": 1,
+          "weight": 1.0,
+          "condition": {
+            "all_of": [
+              {"type": "eq", "field": "body_color", "value": "red"},
+              {"type": "any_label", "field": "coat_color", "values": ["no_coat"]},
+              {"type": "ge", "field": "features.fissure", "value": 0.5}
+            ]
+          },
+          "evidence_text": "舌红提示偏热/阴液不足倾向；少苔提示津液偏少；裂纹进一步支持偏燥偏虚。",
+          "advice": {
+            "diet": "避免辛辣燥热，选择温和滋润类食物，避免过度寒凉。",
+            "lifestyle": "保证睡眠，减少熬夜与过劳。",
+            "exercise": "以舒缓为主（散步、拉伸、太极），避免长期高强度消耗。",
+            "medical": "若长期口干咽燥、潮热盗汗、失眠明显，建议中医辨证。"
+          },
+          "score": {
+            "type": "gm",
+            "terms": [
+              {"field_prob": "body_color.red"},
+              {"field_prob": "coat_color.no_coat"},
+              {"field_prob": "features.fissure"}
+            ],
+            "multiplier": 1.0
+          }
+        }
+      ]
+    }
+  ],
+  "decision_policy": {
+    "topk": 2,
+    "score_low_threshold": 55,
+    "mixed_delta": 10
+  }
+}
