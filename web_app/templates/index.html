@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tongue AI System</title>
+  <style>
+    body { font-family: Arial, "Microsoft YaHei", sans-serif; margin: 24px; background: #fafafa; }
+    .card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; }
+    .ok { background: #e8fff0; color: #137a3a; }
+    .bad { background: #ffecec; color: #a01818; }
+    .muted { color: #666; font-size: 13px; }
+    .kv { display: grid; grid-template-columns: 140px 1fr; gap: 8px 12px; }
+    .kv div { padding: 2px 0; }
+    .topk { padding: 10px; border-radius: 10px; background: #f6f7fb; margin-top: 10px; }
+    pre { white-space: pre-wrap; word-break: break-word; background: #0b1020; color: #cfe3ff; padding: 12px; border-radius: 10px; overflow: auto; }
+    button { padding: 10px 14px; border-radius: 10px; border: 0; background: #2f6fed; color: #fff; cursor: pointer; }
+    button:hover { opacity: 0.92; }
+    input[type="file"] { padding: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Tongue AI System（演示版）</h2>
+  <p class="muted">上传舌象图片 → 质量检测 → 规则引擎（占位模型输出）→ Top-2 体质建议</p>
+
+  <div class="card">
+    <form action="/web/predict" method="post" enctype="multipart/form-data">
+      <div style="margin-bottom: 10px;">
+        <input type="file" name="image" accept="image/*" required />
+      </div>
+      <label class="muted">
+        <input type="checkbox" name="return_debug" value="true" />
+        返回 debug（用于开发）
+      </label>
+      <div style="margin-top: 12px;">
+        <button type="submit">开始分析</button>
+      </div>
+    </form>
+  </div>
+
+  {% if result %}
+  <div class="row">
+    <div class="card">
+      <h3>结果概览</h3>
+      <div>
+        {% if result.quality.pass %}
+          <span class="badge ok">QUALITY PASS</span>
+        {% else %}
+          <span class="badge bad">QUALITY FAIL</span>
+        {% endif %}
+        <span class="muted" style="margin-left:8px;">request_id: {{ result.request_id }}</span>
+      </div>
+
+      <div style="margin-top: 10px;" class="kv">
+        <div class="muted">质量提示</div><div>{{ result.quality.user_tip }}</div>
+        <div class="muted">原因码</div><div>{{ result.quality.reason_codes }}</div>
+        <div class="muted">决策</div><div>{{ result.constitution.decision if result.constitution else "N/A" }}</div>
+      </div>
+
+      {% if image_preview %}
+        <div style="margin-top: 12px;">
+          <div class="muted">上传图片预览</div>
+          <img src="{{ image_preview }}" style="max-width:100%; border-radius:12px; margin-top:8px;" />
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h3>Top-2 体质建议</h3>
+
+      {% if result.constitution and result.constitution.topk %}
+        {% for item in result.constitution.topk %}
+          <div class="topk">
+            <div><b>{{ loop.index }}. {{ item.name }}</b></div>
+            <div class="muted">score: {{ item.score }} | confidence: {{ item.confidence }}</div>
+            <div style="margin-top: 8px;"><b>证据</b>：{{ item.evidence }}</div>
+            <div style="margin-top: 8px;">
+              <b>建议</b>
+              <ul>
+                <li>饮食：{{ item.advice.diet }}</li>
+                <li>作息：{{ item.advice.lifestyle }}</li>
+                <li>运动：{{ item.advice.exercise }}</li>
+                <li>就医：{{ item.advice.medical }}</li>
+              </ul>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="muted">N/A（质量门控未通过或暂无输出）</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>原始 JSON</h3>
+    <pre>{{ raw_json }}</pre>
+  </div>
+  {% endif %}
+</body>
+</html>
