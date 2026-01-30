@@ -1,0 +1,35 @@
+project:
+  name: tongue-ai-system
+  version: "0.1.0"
+
+labels:
+  body_color: ["pale", "red", "dark"]
+  coat_color: ["white", "yellow", "no_coat"]
+  thickness: ["thin", "thick"]
+  greasy: ["non_greasy", "greasy"]
+  features: ["tooth_mark", "fissure"]
+
+quality_gate:
+  enable: true
+  thresholds:
+    blur_min: 80
+    overexpose_ratio_max: 0.25
+    underexpose_ratio_max: 0.25
+    color_cast_max: 0.18
+    tongue_area_ratio_min: 0.15
+
+decision:
+  topk: 2
+  score_low_threshold: 55
+  mixed_delta: 10
+
+paths:
+  data_root: "data"
+  raw: "data/raw"
+  annotations: "data/annotations"
+  processed: "data/processed"
+  models: "data/models"
+  reports: "data/reports"
+
+rules:
+  file: "rule_engine/rules_v2.json"
