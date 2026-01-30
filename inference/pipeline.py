@@ -42,7 +42,7 @@ def _format_segment(conf: float = 1.0, tongue_area_ratio: Optional[float] = None
     return {"conf": float(conf), "tongue_area_ratio": tongue_area_ratio}
 
 
-def run_pipeline(image_bgr, cfg: Dict[str, Any], return_debug: bool = False) -> Dict[str, Any]:
+def run_pipeline(image_bgr, cfg: Dict[str, Any], predictor=None, return_debug: bool = False) -> Dict[str, Any]:
     # ---- Meta ----
     out: Dict[str, Any] = {
         "request_id": str(uuid.uuid4()),
@@ -83,7 +83,10 @@ def run_pipeline(image_bgr, cfg: Dict[str, Any], return_debug: bool = False) -> 
     out["segment"] = _format_segment(conf=1.0, tongue_area_ratio=q.debug.get("rough_tongue_area_ratio"))
 
     # ---- Model prediction (fake now) ----
+    if predictor is None:
     pred = _fake_predictor()
+else:
+    pred = predictor.predict(image_bgr)
     out["tongue"] = pred
 
     # ---- Rule engine ----

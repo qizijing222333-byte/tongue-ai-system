@@ -2,7 +2,7 @@ import json
 import numpy as np
 import cv2
 from flask import Flask, request, jsonify, render_template
-
+from models.predictor import TonguePredictor, load_model_cfg
 from inference.quality_gate import load_config
 from inference.pipeline import run_pipeline
 
@@ -10,7 +10,8 @@ app = Flask(__name__)
 
 CFG = load_config()
 app.config["MAX_CONTENT_LENGTH"] = 6 * 1024 * 1024  # 6MB
-
+MODEL_CFG = load_model_cfg()
+PREDICTOR = TonguePredictor(MODEL_CFG)
 
 @app.get("/health")
 def health():
@@ -39,7 +40,7 @@ def web_predict():
 
     return_debug = request.form.get("return_debug", "false").lower() in ("1", "true", "yes", "on")
 
-    out = run_pipeline(img, CFG, return_debug=return_debug)
+    out = run_pipeline(img, CFG, predictor=PREDICTOR, return_debug=return_debug)
     raw_json = json.dumps(out, ensure_ascii=False, indent=2)
 
     # 简单图片预览：用 data URL（避免存文件）

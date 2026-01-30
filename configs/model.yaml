@@ -1,0 +1,20 @@
+backend: torch           # torch | onnx (后面部署再切)
+device: cpu              # cpu | cuda
+input_size: 224
+weights_path: checkpoints/multitask_mobilenetv2.pt
+
+# 标签集合（必须和训练一致）
+labels:
+  body_color: ["pale", "red", "dark"]
+  coat_color: ["white", "yellow", "no_coat"]
+  thickness: ["thin", "thick"]
+  greasy: ["non_greasy", "greasy"]
+
+# 可选：二分类特征（如果你暂时不训练这两项，也可以先输出0.0）
+features:
+  tooth_mark: {threshold: 0.5}
+  fissure: {threshold: 0.5}
+
+normalize:
+  mean: [0.485, 0.456, 0.406]
+  std:  [0.229, 0.224, 0.225]
