@@ -1,0 +1,43 @@
+# ---- Python ----
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.joblib
+
+# ---- Env ----
+.venv/
+venv/
+.env
+.env.*
+*.env
+*.conda/
+*.egg-info/
+
+# ---- IDE ----
+.vscode/
+.idea/
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+
+# ---- Logs / runs ----
+runs/
+logs/
+*.log
+
+# ---- Data & Artifacts (DO NOT COMMIT) ----
+data/raw/
+data/processed/
+data/annotations/
+data/models/
+data/reports/
+*.onnx
+*.pt
+*.pth
+*.tflite
+
+# ---- Exported images in report ----
+exports/
